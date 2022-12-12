@@ -32,26 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
     public byte[] getJsonString(String name, String message){
         Map<String,String> map = new HashMap<>();
-        map.put("name",name);
-        map.put("message",message);
+        map.put("action",name);
+        map.put("value",message);
         JSONObject json = new JSONObject(map);
         return (json.toString()+"\n").getBytes();
     }
 
-    public void sendOnclick(View view) throws IOException {
-        EditText chatText=(EditText)findViewById(R.id.chatText);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    sender.write(getJsonString(name,chatText.getText().toString()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-        chatText.setText("");
-    }
+
 
     public void leaveOnclick(View view){
         new Thread(new Runnable() {
@@ -69,6 +56,67 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
+    public void happy(View view){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    sender.write(getJsonString("setExpression","HAPPY"));
+                    //socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+
+    public void send(View view){
+        EditText command=(EditText)findViewById(R.id.command);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    sender.write(getJsonString(command.getText().toString(),"SHOCKED"));
+                    //socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+
+    public void startbreathing(View view){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    sender.write(getJsonString("wheelLights","startBreathing"));
+                    //socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+
+    public void startblinking(View view){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    sender.write(getJsonString("wheelLights","startBlinking"));
+                    //socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+
     public void onConnectButtonClick(View view) {
         EditText nameInput=(EditText)findViewById(R.id.editTextName);
         name=nameInput.getText().toString();
@@ -79,11 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.page2);
 
-        TextView nameView=(TextView)findViewById(R.id.nameView);
-        nameView.setText("Hi! "+name+"\n");
 
-        TextView chatTextView=(TextView)findViewById(R.id.chatTextView);
-        chatTextView.setText("Hi! "+name+"\n");
 
         Runnable handlesocket=new Runnable() {
 
@@ -111,17 +155,6 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-                        try {
-                            sender.write(getJsonString(name, "(" + socket.getLocalAddress() + ":" + socket.getLocalPort() + ") Connected"));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        try {
-                            sender.write(getJsonString("", "Welcome " + name + " join us!"));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
 
                         String tmp = "";
                         while (true) {
@@ -142,11 +175,7 @@ public class MainActivity extends AppCompatActivity {
                                     new Runnable() {
                                         @Override
                                         public void run() {
-                                            try {
-                                                chatTextView.append(finalObj.getString("name") + ": " + finalObj.getString("message") + "\n");
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
+
                                         }
                                     }
                             );
